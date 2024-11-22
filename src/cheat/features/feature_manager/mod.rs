@@ -30,11 +30,9 @@ impl FeatureManager {
         self.overlay.begin_scene();
         self.overlay.clear_scene();
 
-        // No need to run a tick if the game isn't maximized
-        if !self.game_ctx.read().unwrap().process.is_focused() {
-            self.overlay.end_scene();
-            return Ok(());
-        }
+        //if !self.should_tick() {
+        //    return Ok(());
+        //}
 
         let game_ctx = self.game_ctx.read().unwrap();
         let config = self.config.read().unwrap();
@@ -91,5 +89,20 @@ impl FeatureManager {
         }
         self.overlay.end_scene();
         Ok(())
+    }
+
+    // Verifies all necessary checks to see if the cheat should run a tick
+    pub fn should_tick(&self) -> bool {
+        // No need to run a tick if the game isn't maximized
+        if !self.game_ctx.read().unwrap().process.is_focused() {
+            return false;
+        };
+
+        true
+        // Add checks as necessary
+    }
+
+    pub fn cleanup(&mut self) {
+        self.overlay.cleanup();
     }
 }

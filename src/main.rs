@@ -3,20 +3,33 @@ pub mod config;
 
 pub mod cheat;
 
-// TODO! Clean up imports
-use std::sync::{Arc, RwLock};
-use std::thread;
-use std::time::Duration;
 use eframe::egui;
 use nvidia_overlay::core::Overlay;
-use crate::cheat::features::feature_manager::FeatureManager;
-use crate::cheat::process::Process;
-use crate::cheat::sdk::entity_list::EntityList;
-use crate::cheat::sdk::GameState;
-use crate::cheat::sdk::player::PlayerManager;
+
+use std::{
+    thread,
+    sync::{
+        Arc,
+        RwLock,
+        atomic::AtomicBool,
+    },
+    time::Duration,
+};
+use std::sync::atomic::Ordering;
+use crate::cheat::{
+    features::feature_manager::FeatureManager,
+    process::Process,
+    sdk::{
+        GameState,
+        entity_list::EntityList,
+        player::PlayerManager,
+    }
+};
+use crate::menu::{
+    gui::Menu,
+    utils::get_random_window_name,
+};
 use crate::config::Config;
-use crate::menu::gui::*;
-use crate::menu::utils::get_random_window_name;
 
 // Base pointer
 pub const LOCAL_PLAYER: u32 = 0x0017E0A8;
@@ -58,27 +71,38 @@ fn main() -> eframe::Result {
     let game_context_game_update_thread = game_context.clone();
     let game_context_overlay_thread = game_context.clone();
 
-    // TODO! Make a handler in the future in case more needs to be updated!
-    let game_update_thread = thread::spawn(move || {
-        loop {
-            game_context_game_update_thread.write().unwrap().update();
-
-            std::thread::sleep(Duration::from_nanos(1));
-        }
-    });
-
     // Feature manager initialization
     let mut feature_manager = FeatureManager::new(
         overlay,
         game_context_overlay_thread,
         config_overlay_thread);
 
-    // Start overlay thread
-    let overlay_thread = thread::spawn(move || {
-        loop {
-            feature_manager.tick().expect("Feature manager failed!");
-            std::thread::sleep(Duration::from_nanos(1));
+    // Atomic bools allow for easy cleanup because it is simpler to determine when the app is running
+    let process_running = Arc::new(AtomicBool::new(true));
+    let running_game_update_thread = process_running.clone();
+    let running_overlay_thread = process_running.clone();
+
+    // TODO! Make a handler in the future in case more needs to be updated!
+    // START GAME UPDATE THREAD
+    thread::spawn(move || {
+        while running_game_update_thread.load(Ordering::Relaxed) {
+            game_context_game_update_thread.write().unwrap().update();
+            thread::sleep(Duration::from_nanos(1));
         }
+        // All resources automatically dropped
+        log::debug!("Exited game update thread");
+    });
+
+    // START OVERLAY THREAD
+    thread::spawn(move || {
+        // Test FPS with and without this check in the future!
+        while running_overlay_thread.load(Ordering::Relaxed) {
+            feature_manager.tick().expect("Feature manager failed!");
+            thread::sleep(Duration::from_nanos(1));
+        }
+        // Overlay needs to be explicitly dropped
+        log::debug!("Exited overlay thread");
+        feature_manager.cleanup();
     });
     
     // Randomize app name
@@ -104,7 +128,7 @@ fn main() -> eframe::Result {
         storage_name,
         options,
         Box::new(|cc| {
-            Ok(Box::new(Menu::new(config, cc)))
+            Ok(Box::new(Menu::new(config, process_running, cc)))
         }),
     )
 }

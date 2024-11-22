@@ -4,10 +4,21 @@ mod tab_selector;
 mod menu_config;
 mod style;
 
-use std::sync::{Arc, RwLock};
-use std::thread::Thread;
-use eframe::egui::Context;
-use eframe::{egui, Frame, Storage};
+use std::{
+    thread::Thread,
+    sync::{
+        Arc,
+        RwLock,
+        atomic::AtomicBool,
+    },
+};
+use std::sync::atomic::Ordering;
+use eframe::{
+    egui,
+    egui::Context,
+    Frame,
+    Storage,
+};
 use nvidia_overlay::core::Overlay;
 use serde::{Deserialize, Serialize};
 use crate::config::*;
@@ -25,11 +36,13 @@ pub struct Menu {
     tab_visuals: TabVisuals,
     tab_misc: TabMisc,
     tab_menu_config: TabMenuConfig,
+    #[serde(skip)]
+    process_running: Arc<AtomicBool>
 }
 
 impl Menu {
     /// Called once before the first frame.
-    pub fn new(config: Arc<RwLock<Config>>, cc: &eframe::CreationContext) -> Self {
+    pub fn new(config: Arc<RwLock<Config>>, process_running: Arc<AtomicBool>, cc: &eframe::CreationContext) -> Self {
 
         match style::set_custom_visuals(cc) {
             Ok(()) => log::debug!("Successfully set menu visual settings."),
@@ -61,6 +74,7 @@ impl Menu {
             tab_visuals,
             tab_misc,
             tab_menu_config,
+            process_running,
         }
     }
 
@@ -111,6 +125,9 @@ impl eframe::App for Menu {
 
     fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
         log::info!("Application exiting...");
+
+        // Signal threads to stop
+        self.process_running.store(false, Ordering::Relaxed);
 
         // Note: eframe calls save on exit
     }
