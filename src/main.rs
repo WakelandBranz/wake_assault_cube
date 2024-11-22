@@ -101,8 +101,8 @@ fn main() -> eframe::Result {
             thread::sleep(Duration::from_nanos(1));
         }
         // Overlay needs to be explicitly dropped
-        log::debug!("Exited overlay thread");
         feature_manager.cleanup();
+        log::debug!("Exited overlay thread");
     });
     
     // Randomize app name

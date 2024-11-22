@@ -26,13 +26,14 @@ impl FeatureManager {
     }
 
     pub fn tick(&mut self) -> Result<(), OverlayError> {
+        // Ensure that all conditions are met to actually run features
+        if !self.should_tick() {
+            return Ok(());
+        }
+
         // Prepare screen for next render
         self.overlay.begin_scene();
         self.overlay.clear_scene();
-
-        //if !self.should_tick() {
-        //    return Ok(());
-        //}
 
         let game_ctx = self.game_ctx.read().unwrap();
         let config = self.config.read().unwrap();
@@ -52,7 +53,8 @@ impl FeatureManager {
             // Get head position first
             let head_screen_pos = match game_ctx.world_to_screen(
                 player.pos_head.into(),
-                false)
+                false
+            )
             {
                 Some(pos) => pos,
                 None => continue, // Skip if not visible
@@ -62,7 +64,8 @@ impl FeatureManager {
             let feet_screen_pos = match game_ctx.world_to_screen(
                 player.pos.into(),
                 false
-            ) {
+            )
+            {
                 Some(pos) => pos,
                 None => continue,
             };
@@ -103,6 +106,7 @@ impl FeatureManager {
     }
 
     pub fn cleanup(&mut self) {
+        // This might cause a cleanup twice...
         self.overlay.cleanup();
     }
 }
