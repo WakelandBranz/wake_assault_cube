@@ -6,16 +6,6 @@ pub struct TabMenuConfig {
     configuration: Configuration,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct MenuSettings {
-    example: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Configuration {
-    example: String,
-}
-
 impl Default for TabMenuConfig {
     fn default() -> Self {
         Self {
@@ -25,18 +15,20 @@ impl Default for TabMenuConfig {
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct MenuSettings {}
+
+#[derive(Serialize, Deserialize)]
+pub struct Configuration {}
+
 impl Default for MenuSettings {
     fn default() -> Self {
-        Self {
-            example: "example".to_string(),
-        }
+        Self {}
     }
 }
 
 impl Default for Configuration {
     fn default() -> Self {
-        Self {
-            example: "example".to_string(),
-        }
+        Self {}
     }
 }

@@ -57,6 +57,7 @@ fn main() -> eframe::Result {
     // Gather info for game update thread
     // Process initialization
     let process = Process::new("ac_client.exe");
+    let should_render = Arc::new(AtomicBool::new(true));
 
     // Local player initialization
     let local_player_ptr = process.read::<u32>(process.base_address + LOCAL_PLAYER).unwrap();
@@ -79,13 +80,13 @@ fn main() -> eframe::Result {
 
     // Atomic bools allow for easy cleanup because it is simpler to determine when the app is running
     let process_running = Arc::new(AtomicBool::new(true));
-    let running_game_update_thread = process_running.clone();
     let running_overlay_thread = process_running.clone();
 
     // TODO! Make a handler in the future in case more needs to be updated!
     // START GAME UPDATE THREAD
     thread::spawn(move || {
-        while running_game_update_thread.load(Ordering::Relaxed) {
+        loop {
+            // TODO! Run check to see if the game is still open, if not, exit.
             game_context_game_update_thread.write().unwrap().update();
             thread::sleep(Duration::from_nanos(1));
         }
@@ -95,13 +96,11 @@ fn main() -> eframe::Result {
 
     // START OVERLAY THREAD
     thread::spawn(move || {
-        // Test FPS with and without this check in the future!
+        // TODO! Test FPS with and without this check in the future!
         while running_overlay_thread.load(Ordering::Relaxed) {
             feature_manager.tick().expect("Feature manager failed!");
             thread::sleep(Duration::from_nanos(1));
         }
-        // Overlay needs to be explicitly dropped
-        feature_manager.cleanup();
         log::debug!("Exited overlay thread");
     });
     

@@ -86,7 +86,7 @@ impl Menu {
         egui::CentralPanel::default().show(ctx, |ui| {
             match self.tab_selector.selected_tab() {
                 Tab::Visuals => self.tab_visuals.render(ui, self.config.clone()),
-                Tab::Misc => self.render_misc(ui),
+                Tab::Misc => self.tab_misc.render(ui, self.config.clone()),
                 Tab::MenuConfig => self.render_menu_config(ui),
             }
         });
@@ -105,14 +105,13 @@ impl Menu {
 
 // Main rendering loop
 impl eframe::App for Menu {
+
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         // Ensure that config is parsed before running first render loop!
 
         // Main render loop
         self.render_content(ctx);
 
-        // Update config settings
-        // TODO!() self.config.update();
     }
 
     fn save(&mut self, storage: &mut dyn Storage) {

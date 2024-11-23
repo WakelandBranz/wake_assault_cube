@@ -5,9 +5,14 @@ use serde::{Deserialize, Serialize};
 
 use nvidia_overlay::core::{Overlay, OverlayError};
 use crate::cheat::{
-    features::visuals::{
-        Visuals,
-        render_context::RenderContext,
+    features::{
+        visuals::{
+            Visuals,
+            render_context::RenderContext,
+        },
+        misc::{
+            Misc,
+        }
     },
     sdk::{
         GameState,
@@ -15,14 +20,15 @@ use crate::cheat::{
     }
 };
 
-
 pub mod visuals;
 pub mod view;
 pub mod feature_manager;
+mod misc;
 
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct Features {
     pub(crate) visuals: Visuals,
+    pub(crate) misc: Misc,
 }
 
 // Core feature trait - just the basics
@@ -48,6 +54,12 @@ pub trait Feature {
     }
 }
 
-
-
+fn get_color_rgba(color: [f32; 4]) -> (u8, u8, u8, u8) {
+    (
+        (color[0] * 255.0) as u8,
+        (color[1] * 255.0) as u8,
+        (color[2] * 255.0) as u8,
+        (color[3] * 255.0) as u8,
+    )
+}
 

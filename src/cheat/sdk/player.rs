@@ -34,7 +34,7 @@ impl Player {
     // Check if player is alive
     // Dead players have an extremely high health value, not <= 0
     pub fn is_alive(&self) -> bool {
-        self.health <= 100
+        self.health < 101 && self.health > 0
     }
 
     // Vector helper methods

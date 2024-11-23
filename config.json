@@ -7,7 +7,7 @@
           1.0,
           1.0,
           1.0,
-          1.0
+          255.0
         ],
         "thickness": 1.0,
         "width_scale": 0.5
@@ -15,12 +15,33 @@
       "name_esp": {
         "enabled": true,
         "color": [
-          1.0,
-          1.0,
-          1.0,
-          0.87636364
+          255.0,
+          255.0,
+          255.0,
+          255.0
         ],
         "y_offset": -15.0
+      },
+      "healthbar_esp": {
+        "enabled": true,
+        "thickness": 0.32,
+        "width_scale": 0.02,
+        "x_offset": 27.0
+      }
+    },
+    "misc": {
+      "fps": {
+        "enabled": true,
+        "color": [
+          0.0,
+          255.0,
+          0.000060796738,
+          255.0
+        ],
+        "pos": [
+          1762,
+          280
+        ]
       }
     }
   }

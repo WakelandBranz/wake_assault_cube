@@ -1,4 +1,5 @@
 use std::sync::{Arc, RwLock};
+use eframe::egui::Vec2;
 use nvidia_overlay::core::{Overlay, OverlayError};
 use crate::cheat::{
     features::{
@@ -9,10 +10,14 @@ use crate::cheat::{
 };
 use crate::config::Config;
 
+extern crate fps_counter;
+use fps_counter::*;
+
 pub struct FeatureManager {
     overlay: Overlay,
     game_ctx: Arc<RwLock<GameState>>,
-    config: Arc<RwLock<Config>>
+    config: Arc<RwLock<Config>>,
+    fps_counter: FPSCounter,
 }
 
 impl FeatureManager {
@@ -21,7 +26,8 @@ impl FeatureManager {
         Self {
             overlay,
             game_ctx,
-            config
+            config,
+            fps_counter: FPSCounter::default(),
         }
     }
 
@@ -35,39 +41,36 @@ impl FeatureManager {
         self.overlay.begin_scene();
         self.overlay.clear_scene();
 
+        // Unwrap main structs
         let game_ctx = self.game_ctx.read().unwrap();
         let config = self.config.read().unwrap();
 
-        let visuals = config.clone().features.visuals;
-        for player in game_ctx.entity_list.entities.clone() {
+        // Unwrap feature structs
+        let visuals = &config.features.visuals;
+        let misc = &config.features.misc;
+
+        for player in &game_ctx.entity_list.entities {
             // Skip if entity is not valid
             if !player.is_alive() {
                 continue;
             }
 
-            // Check if any features are enabled before doing transforms
-            if !visuals.box_esp.is_enabled() && !visuals.name_esp.is_enabled() {
-                continue;
-            }
-
             // Get head position first
-            let head_screen_pos = match game_ctx.world_to_screen(
+            let Some(head_screen_pos) = game_ctx.world_to_screen(
                 player.pos_head.into(),
                 false
             )
-            {
-                Some(pos) => pos,
-                None => continue, // Skip if not visible
+            else {
+                continue
             };
 
             // Get feet position if needed
-            let feet_screen_pos = match game_ctx.world_to_screen(
+            let Some(feet_screen_pos) = game_ctx.world_to_screen(
                 player.pos.into(),
                 false
             )
-            {
-                Some(pos) => pos,
-                None => continue,
+            else {
+                continue
             };
 
             // Calculate distance (useful for scaling)
@@ -81,32 +84,38 @@ impl FeatureManager {
                 distance,
             };
 
-            // Render enabled features
-            if visuals.box_esp.is_enabled() {
-                visuals.box_esp.render(&player, &render_ctx, &mut self.overlay)?;
-            }
-
-            if visuals.name_esp.is_enabled() {
-                visuals.name_esp.render(&player, &render_ctx, &mut self.overlay)?;
-            }
+            // Render features (features check themselves if they are enabled)
+            visuals.box_esp.render(&player, &render_ctx, &mut self.overlay)?;
+            visuals.name_esp.render(&player, &render_ctx, &mut self.overlay)?;
+            visuals.healthbar_esp.render(&player, &render_ctx, &mut self.overlay)?;
         }
+        misc.fps.display(self.fps_counter.tick(), misc.fps.pos_to_vec2(misc.fps.pos), &mut self.overlay)?;
+
         self.overlay.end_scene();
         Ok(())
     }
 
     // Verifies all necessary checks to see if the cheat should run a tick
-    pub fn should_tick(&self) -> bool {
+    pub fn should_tick(&mut self) -> bool {
         // No need to run a tick if the game isn't maximized
         if !self.game_ctx.read().unwrap().process.is_focused() {
+            self.overlay.force_clear_scene();
             return false;
         };
 
+        let visuals = &self.config.read().unwrap().features.visuals;
+        let misc = &self.config.read().unwrap().features.misc;
+
+        // Check if any features are enabled before doing transforms
+        if !visuals.box_esp.is_enabled()
+            && !visuals.name_esp.is_enabled()
+            && !visuals.healthbar_esp.is_enabled()
+            && !misc.fps.is_enabled()
+        {
+            return false;
+        }
+
         true
         // Add checks as necessary
-    }
-
-    pub fn cleanup(&mut self) {
-        // This might cause a cleanup twice...
-        self.overlay.cleanup();
     }
 }

@@ -4,6 +4,8 @@ use process::*;
 
 use std::mem;
 use std::ptr::null_mut;
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 use sysinfo::System;
 use windows::core::PCSTR;
 use windows::Win32::{
@@ -51,6 +53,7 @@ pub struct Process {
     pid: u32,
     handle: HANDLE,
     window_handle: HWND,
+    //is_focused: Arc<AtomicBool>,
     pub(crate) base_address: u32,
 }
 

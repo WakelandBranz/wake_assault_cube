@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec3, Vec4, Mat4, Vec4Swizzles};
+use glam::{Vec2, Vec4, Vec4Swizzles};
 use crate::cheat::{
     process::Process,
     sdk::{
@@ -20,7 +20,7 @@ pub struct GameState {
     pub process: Process,
     pub local_player: PlayerManager,
     pub entity_list: EntityList,
-    pub screen_bounds: glam::Vec2,
+    pub screen_bounds: Vec2,
     pub render_context: RenderContext,
 }
 
