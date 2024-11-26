@@ -10,5 +10,5 @@ This program runs using three threads.
     - Reads the game's memory and updates generally useful values
 ### Thread 3 - Overlay thread
     - Hijacks the Nvidia Geforce Overlay
-    - Uses D2D for rendering (using windows-rs, fully memory safe!)
+    - Uses D2D for rendering (using windows-rs)
     - Exits based on an AtomicBool handled by main thread
