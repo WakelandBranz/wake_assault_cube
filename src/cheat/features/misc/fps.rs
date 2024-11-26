@@ -1,4 +1,3 @@
-use glam::Vec2;
 use nvidia_overlay::core::{Overlay, OverlayError};
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +23,7 @@ pub struct FPS {
     // Just gotta get stuff working for now.
     pub enabled: bool,
     pub color: [f32; 4],
-    pub pos: [u32; 2],
+    pub pos: [f32; 2],
 }
 
 impl Default for FPS {
@@ -32,7 +31,7 @@ impl Default for FPS {
         Self {
             enabled: false,
             color: [0.0, 255.0, 0.0, 255.0],  // Green RGBA
-            pos: [1762, 280],
+            pos: [1762.0, 280.0],
         }
     }
 }
@@ -68,7 +67,6 @@ impl FPS {
     pub(crate) fn display(
         &self,
         fps: usize, // FPSCounter.tick() returns a usize
-        pos: Vec2, // TODO! Replace this with window_context later!
         overlay: &mut Overlay
     ) -> Result<(), OverlayError> {
         if !self.is_enabled() {
@@ -76,14 +74,9 @@ impl FPS {
         }
 
         overlay.draw_text(
-            (pos.x, pos.y),
+            (self.pos[0], self.pos[1]),
             format!("FPS: {}", fps),
             get_color_rgba(self.color))?;
         Ok(())
-    }
-
-    // Useful for rendering
-    pub(crate) fn pos_to_vec2(&self, pos: [u32; 2]) -> Vec2 {
-        Vec2::new(pos[0] as f32, pos[1] as f32)
     }
 }

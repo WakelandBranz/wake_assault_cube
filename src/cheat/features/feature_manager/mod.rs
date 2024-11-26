@@ -89,7 +89,8 @@ impl FeatureManager {
             visuals.name_esp.render(&player, &render_ctx, &mut self.overlay)?;
             visuals.healthbar_esp.render(&player, &render_ctx, &mut self.overlay)?;
         }
-        misc.fps.display(self.fps_counter.tick(), misc.fps.pos_to_vec2(misc.fps.pos), &mut self.overlay)?;
+        // Get framerate by counting once each loop.
+        misc.fps.display(self.fps_counter.tick(), &mut self.overlay)?;
 
         self.overlay.end_scene();
         Ok(())
