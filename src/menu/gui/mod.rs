@@ -19,7 +19,7 @@ use eframe::{
     Frame,
     Storage,
 };
-use nvidia_overlay::core::Overlay;
+use nvidia_amd_overlay::core::Overlay;
 use serde::{Deserialize, Serialize};
 use crate::config::*;
 use crate::menu::gui::{

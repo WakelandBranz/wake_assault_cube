@@ -1,4 +1,4 @@
-use nvidia_overlay::core::{Overlay, OverlayError};
+use nvidia_amd_overlay::core::{Overlay, OverlayError};
 use serde::{Deserialize, Serialize};
 
 use crate::cheat::{

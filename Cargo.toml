@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-nvidia_overlay = { path = "nvidia_overlay" }
+nvidia_amd_overlay = { path = "nvidia_amd_overlay" }
 
 # Universal Dependencies ------------------
 log = "0.4.22"

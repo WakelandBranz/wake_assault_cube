@@ -4,7 +4,7 @@ pub mod config;
 pub mod cheat;
 
 use eframe::egui;
-use nvidia_overlay::core::Overlay;
+use nvidia_amd_overlay::core::Overlay;
 
 use std::{
     thread,
@@ -41,7 +41,7 @@ fn main() -> eframe::Result {
         .format_timestamp_secs()
         .init();
 
-    let mut overlay = Overlay::new("Calibri", 12.0);
+    let mut overlay = Overlay::new("Tahoma", 12.0);
     overlay.init().expect("Failed to initialize overlay");
     overlay.startup_d2d().expect("Failed to startup D2D for overlay");
 
@@ -120,7 +120,6 @@ fn main() -> eframe::Result {
 
     // Fixed name for state storage
     let storage_name = "wakey wakey";
-
 
     // Instead of run_simple_native, use run_native
     eframe::run_native(

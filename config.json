@@ -4,27 +4,27 @@
       "box_esp": {
         "enabled": true,
         "color": [
-          1.0,
-          1.0,
-          1.0,
+          0.45058203,
+          0.2310257,
+          0.2310257,
           255.0
         ],
         "thickness": 1.0,
         "width_scale": 0.5
       },
       "name_esp": {
-        "enabled": true,
+        "enabled": false,
         "color": [
-          255.0,
-          255.0,
-          255.0,
-          255.0
+          1.0,
+          1.0,
+          1.0,
+          1.0
         ],
         "y_offset": -15.0
       },
       "healthbar_esp": {
         "enabled": true,
-        "thickness": 0.32,
+        "thickness": 0.33,
         "width_scale": 0.02,
         "x_offset": 27.0
       }
@@ -34,13 +34,13 @@
         "enabled": true,
         "color": [
           0.0,
-          255.0,
-          0.000060796738,
+          1.0,
+          2.3841858e-7,
           255.0
         ],
         "pos": [
-          1762,
-          280
+          1762.0,
+          280.0
         ]
       }
     }

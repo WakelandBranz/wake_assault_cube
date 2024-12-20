@@ -3,7 +3,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use nvidia_overlay::core::{Overlay, OverlayError};
+use nvidia_amd_overlay::core::{Overlay, OverlayError};
 use crate::cheat::{
     features::{
         visuals::{

@@ -1,6 +1,6 @@
 use std::sync::{Arc, RwLock};
 use eframe::egui::Vec2;
-use nvidia_overlay::core::{Overlay, OverlayError};
+use nvidia_amd_overlay::core::{Overlay, OverlayError};
 use crate::cheat::{
     features::{
         Feature,

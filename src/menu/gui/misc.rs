@@ -35,15 +35,15 @@ impl TabMisc {
 
                     ui.horizontal(|ui| {
                         ui.label("Position:");
-                        ui.add(egui::Slider::new(&mut fps.pos[0], 0..=1920)
+                        ui.add(egui::Slider::new(&mut fps.pos[0], 0.0..=1920.0)
                             .text("X"));
-                        ui.add(egui::Slider::new(&mut fps.pos[1], 0..=1080)
+                        ui.add(egui::Slider::new(&mut fps.pos[1], 0.0..=1080.0)
                             .text("Y"));
                     });
 
                     // Add a reset button
                     if ui.button("Reset Position").clicked() {
-                        fps.pos = [100, 100]; // Default position
+                        fps.pos = [100.0, 100.0]; // Default position
                     }
                 });
         }
