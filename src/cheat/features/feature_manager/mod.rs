@@ -1,5 +1,4 @@
 use std::sync::{Arc, RwLock};
-use eframe::egui::Vec2;
 use nvidia_amd_overlay::core::{Overlay, OverlayError};
 use crate::cheat::{
     features::{
@@ -12,6 +11,7 @@ use crate::config::Config;
 
 extern crate fps_counter;
 use fps_counter::*;
+use nvidia_amd_overlay::helper::OverlayHelper;
 
 pub struct FeatureManager {
     overlay: Overlay,
@@ -91,6 +91,9 @@ impl FeatureManager {
         }
         // Get framerate by counting once each loop.
         misc.fps.display(self.fps_counter.tick(), &mut self.overlay)?;
+
+        // Check if we need to clear text layout cache
+        self.overlay.try_clear_text_layout_cache();
 
         self.overlay.end_scene();
         Ok(())
