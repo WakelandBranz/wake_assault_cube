@@ -31,7 +31,7 @@ impl Default for FPS {
         Self {
             enabled: false,
             color: [0.0, 255.0, 0.0, 255.0],  // Green RGBA
-            pos: [1762.0, 280.0],
+            pos: [1755.0, 280.0],
         }
     }
 }
@@ -73,9 +73,9 @@ impl FPS {
             return Ok(());
         }
 
-        overlay.draw_text(
+        overlay.draw_outlined_text(
             (self.pos[0], self.pos[1]),
-            format!("FPS: {}", fps),
+            format!("FPS: {}", fps).as_str(),
             get_color_rgba(self.color))?;
         Ok(())
     }

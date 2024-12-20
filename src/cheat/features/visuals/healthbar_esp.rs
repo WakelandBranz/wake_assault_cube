@@ -14,6 +14,7 @@ use crate::cheat::{
         }
     },
 };
+use crate::cheat::features::visuals::Position;
 
 // BoxEsp feature with UI integration
 #[derive(Serialize, Deserialize, Clone)]
@@ -23,17 +24,18 @@ pub struct HealthbarESP {
     // Just gotta get stuff working for now.
     pub enabled: bool,
     pub thickness: f32,
-    pub width_scale: f32,
-    pub x_offset: f32,
+    pub top_down: bool,
+    pub position: Position,
 }
 
 impl Default for HealthbarESP {
     fn default() -> Self {
         Self {
             enabled: false,
-            thickness: 0.32,
-            width_scale: 0.02,
-            x_offset: 27.0,
+            top_down: false,
+            thickness: 0.050,
+            position: Position::Right
+            //x_offset: 27.0,
         }
     }
 }
@@ -70,30 +72,86 @@ impl Feature for HealthbarESP {
         let red = 1.0 - green;  // Inverse in 0.0-1.0 range
         let healthbar_color: [f32; 4] = [red, green, 0.0, 1.0];
 
-        let height = render_ctx.feet_screen_pos.y - render_ctx.head_screen_pos.y;
-        let width = height * self.width_scale;
+        // Calculate dimensions and positions based on orientation
+        let (x_pos, y_pos, bar_width, bar_height, health_width, health_height) = match self.position {
+            Position::Top => {
+                let bar_width = render_ctx.player_width;
+                let bar_height = render_ctx.player_height * self.thickness;
+                let health_width = bar_width * (player.health as f32 / 100.0);
 
-        let scaled_x_offset = self.x_offset * (height / 100.0);
+                (
+                    render_ctx.head_screen_pos.x - (bar_width / 2.0),
+                    render_ctx.head_screen_pos.y - bar_height - 5.0,
+                    bar_width,
+                    bar_height,
+                    health_width,
+                    bar_height
+                )
+            },
+            Position::Bottom => {
+                let bar_width = render_ctx.player_width;
+                let bar_height = render_ctx.player_height * self.thickness;
+                let health_width = bar_width * (player.health as f32 / 100.0);
 
-        // Position calculation for both rectangles
-        let x_pos = render_ctx.head_screen_pos.x + scaled_x_offset;
-        let y_pos = render_ctx.head_screen_pos.y;
+                (
+                    render_ctx.head_screen_pos.x - (bar_width / 2.0),
+                    render_ctx.feet_screen_pos.y + 5.0,
+                    bar_width,
+                    bar_height,
+                    health_width,
+                    bar_height
+                )
+            },
+            Position::Left => {
+                let bar_width = render_ctx.player_width * self.thickness;
+                let bar_height = render_ctx.player_height;
+                let health_height = bar_height * (player.health as f32 / 100.0);
 
-        // Outline rectangle
+                (
+                    render_ctx.head_screen_pos.x - (render_ctx.player_width / 2.0) - bar_width - 2.5,
+                    render_ctx.head_screen_pos.y,
+                    bar_width,
+                    bar_height,
+                    bar_width,
+                    health_height
+                )
+            },
+            Position::Right => {
+                let bar_width = render_ctx.player_width * self.thickness;
+                let bar_height = render_ctx.player_height;
+                let health_height = bar_height * (player.health as f32 / 100.0);
+
+                (
+                    render_ctx.head_screen_pos.x + (render_ctx.player_width / 2.0) + 2.5,
+                    render_ctx.head_screen_pos.y,
+                    bar_width,
+                    bar_height,
+                    bar_width,
+                    health_height
+                )
+            },
+            _ => unreachable!()
+        };
+
+        // Draw black background bar (always full size)
         overlay.draw_filled_rect(
             (x_pos, y_pos),
-            (width, height),
+            (bar_width, bar_height),
             (0, 0, 0, 255)
         )?;
 
-        // Calculate health-scaled height
-        let health_height = height * (player.health as f32 / 100.0);
+        // Draw health bar on top (sized according to health percentage)
+        // Draw health bar
+        let health_y_pos = if self.position == Position::Left && self.top_down || self.position == Position::Right && self.top_down {
+            y_pos
+        }
+        else {
+            y_pos + (bar_height - health_height)
+        };
 
-        // Overlay.draw will return a Result<(), OverlayError>, so we can just use that to propagate
-        // Primary rectangle
         overlay.draw_filled_rect(
-            (x_pos, y_pos),
-            (width, health_height),
+            (x_pos, health_y_pos),
+            (health_width, health_height),
             get_color_rgba(healthbar_color)
         )
     }

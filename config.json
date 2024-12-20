@@ -4,29 +4,78 @@
       "box_esp": {
         "enabled": true,
         "color": [
-          1.0,
-          1.0,
-          1.0,
+          0.27774048,
+          0.067667685,
+          0.067667685,
           1.0
         ],
+        "outline_color": [
+          0.0,
+          0.0,
+          0.0,
+          0.17454545
+        ],
         "thickness": 1.0,
-        "width_scale": 0.5
+        "is_filled": true,
+        "fill_color1": [
+          0.11572203,
+          0.012624224,
+          0.012624224,
+          0.56
+        ],
+        "fill_color2": [
+          0.007668301,
+          0.0046288655,
+          0.0046288655,
+          0.18545455
+        ],
+        "is_vertical": true
+      },
+      "head_esp": {
+        "enabled": true,
+        "color": [
+          0.085492425,
+          0.009326448,
+          0.009326448,
+          255.0
+        ],
+        "outline_color": [
+          0.0,
+          0.0,
+          0.0,
+          255.0
+        ],
+        "thickness": 1.0,
+        "is_filled": true,
+        "fill_color1": [
+          0.3228077,
+          0.02112923,
+          0.02112923,
+          0.27636364
+        ],
+        "fill_color2": [
+          255.0,
+          255.0,
+          255.0,
+          0.03272727
+        ],
+        "is_radial": false
       },
       "name_esp": {
         "enabled": true,
         "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
+          255.0,
+          255.0,
+          255.0,
+          255.0
         ],
-        "y_offset": -15.0
+        "position": "Bottom"
       },
       "healthbar_esp": {
         "enabled": true,
-        "thickness": 0.33,
-        "width_scale": 0.02,
-        "x_offset": 27.0
+        "thickness": 0.029,
+        "top_down": false,
+        "position": "Left"
       }
     },
     "misc": {
@@ -34,12 +83,12 @@
         "enabled": true,
         "color": [
           0.0,
-          1.0,
-          2.3841858e-7,
+          255.0,
+          0.000060796738,
           255.0
         ],
         "pos": [
-          1762.0,
+          1755.0,
           280.0
         ]
       }

@@ -2,8 +2,6 @@
 // Thank you WilgnerFSDev
 pub mod core;
 pub mod helper;
-
-use str_crypter::{decrypt_string, sc};
 use crate::{
     core::{Overlay, OverlayError},
 };
@@ -216,7 +214,7 @@ impl Overlay {
                 width: (rect.right - rect.left) as u32,
                 height: (rect.bottom - rect.top) as u32,
             },
-            presentOptions: D2D1_PRESENT_OPTIONS_NONE,
+            presentOptions: D2D1_PRESENT_OPTIONS_IMMEDIATELY,
         };
 
         let target = unsafe {
@@ -361,7 +359,7 @@ mod tests {
             // Text at the top
             overlay.draw_text(
                 (10.0, 30.0),
-                "https://github.com/WakelandBranz/nvidia-overlay-hijack\nShape Showcase".to_string(),
+                "https://github.com/WakelandBranz/nvidia-overlay-hijack\nShape Showcase",
                 (255, 255, 255, 255),
             ).expect("Failed to draw text");
 

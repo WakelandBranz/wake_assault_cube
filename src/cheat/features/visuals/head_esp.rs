@@ -17,7 +17,7 @@ use crate::cheat::{
 
 // BoxEsp feature with UI integration
 #[derive(Serialize, Deserialize, Clone)]
-pub struct BoxEsp {
+pub struct HeadEsp {
     // I'd like to remove enabled in the future so that when all features are being iterated through
     // and rendered or updated I can save on an if statement, but that'll be for another time.
     // Just gotta get stuff working for now.
@@ -28,10 +28,10 @@ pub struct BoxEsp {
     pub is_filled: bool,
     pub fill_color1: [f32; 4],
     pub fill_color2: [f32; 4],
-    pub is_vertical: bool,
+    pub is_radial: bool,
 }
 
-impl Default for BoxEsp {
+impl Default for HeadEsp {
     fn default() -> Self {
         Self {
             enabled: false,
@@ -41,12 +41,12 @@ impl Default for BoxEsp {
             is_filled: false,
             fill_color1: [255.0, 255.0, 255.0, 255.0],
             fill_color2: [255.0, 255.0, 255.0, 255.0],
-            is_vertical: false,
+            is_radial: false,
         }
     }
 }
 
-impl Feature for BoxEsp {
+impl Feature for HeadEsp {
 
     fn is_enabled(&self) -> bool {
         self.enabled
@@ -63,43 +63,45 @@ impl Feature for BoxEsp {
 
     fn render(
         &self,
-        _player: &Player, // Not needed for box rendering
+        _player: &Player,
         render_ctx: &RenderContext,
         overlay: &mut Overlay
     ) -> Result<(), OverlayError> {
-        // Don't run if not enabled
         if !self.is_enabled() {
-            return Ok(())
+            return Ok(());
         }
 
-        let height = render_ctx.feet_screen_pos.y - render_ctx.head_screen_pos.y;
-        let width = height * 0.5;
+        // Calculate distance-based scaling
+        let distance = render_ctx.distance;
+        let scaled_radius = (25.0 / (distance * 0.1)).min(75.0); // Prevents too large scaling
 
+        // Draw gradient fill first if enabled
         if self.is_filled {
-            overlay.draw_gradient_rect(
-                (render_ctx.head_screen_pos.x - width / 2.0, render_ctx.head_screen_pos.y),
-                (width, height),
+            overlay.draw_gradient_circle(
+                (render_ctx.head_screen_pos.x, render_ctx.head_screen_pos.y),
+                scaled_radius - self.thickness, // Reduce radius to prevent overflow
                 get_color_rgba(self.fill_color1),
                 get_color_rgba(self.fill_color2),
-                self.is_vertical,
+                self.is_radial,
             )?;
         }
 
-        // Outline rectangle
-        overlay.draw_rect(
-            (render_ctx.head_screen_pos.x - width / 2.0, render_ctx.head_screen_pos.y),
-            (width, height),
-            self.thickness * 2.5, // Extra thickness borders both sides of primary rectangle
-            get_color_rgba(self.outline_color),
+        // Draw outline using a single thicker circle
+        overlay.draw_circle(
+            (render_ctx.head_screen_pos.x, render_ctx.head_screen_pos.y),
+            scaled_radius + self.thickness, // Outer circle (outline)
+            self.thickness * 2.0,
+            get_color_rgba(self.outline_color)
         )?;
 
-        // Overlay.draw will return a Result<(), OverlayError>, so we can just use that to propagate
-        // Primary rectangle
-        overlay.draw_rect(
-            (render_ctx.head_screen_pos.x - width / 2.0, render_ctx.head_screen_pos.y),
-            (width, height),
+        // Draw main circle
+        overlay.draw_circle(
+            (render_ctx.head_screen_pos.x, render_ctx.head_screen_pos.y),
+            scaled_radius,
             self.thickness,
             get_color_rgba(self.color)
-        )
+        )?;
+
+        Ok(())
     }
 }

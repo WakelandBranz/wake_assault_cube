@@ -32,9 +32,11 @@ impl GameState {
             entity_list,
             screen_bounds: process.get_screen_bounds().unwrap(),
             render_context: RenderContext {
-                head_screen_pos: Default::default(),
-                feet_screen_pos: Default::default(),
-                screen_bounds: Default::default(),
+                head_screen_pos: Vec2::new(0.0, 0.0),
+                feet_screen_pos: Vec2::new(0.0, 0.0),
+                player_height: 0.0,
+                player_width: 0.0,
+                screen_bounds: Vec2::new(0.0, 0.0),
                 distance: 0.0,
             },
         }

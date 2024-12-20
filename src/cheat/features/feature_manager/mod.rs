@@ -73,19 +73,25 @@ impl FeatureManager {
                 continue
             };
 
-            // Calculate distance (useful for scaling)
+
+
+            let player_height = feet_screen_pos.y - head_screen_pos.y;
+            let player_width = player_height * 0.5;
             let distance = (game_ctx.local_player.position() - player.pos).length();
 
             // Create render context with shared data
             let render_ctx = RenderContext {
                 head_screen_pos,
                 feet_screen_pos,
+                player_height,
+                player_width,
                 screen_bounds: game_ctx.screen_bounds,
                 distance,
             };
 
             // Render features (features check themselves if they are enabled)
             visuals.box_esp.render(&player, &render_ctx, &mut self.overlay)?;
+            visuals.head_esp.render(&player, &render_ctx, &mut self.overlay)?;
             visuals.name_esp.render(&player, &render_ctx, &mut self.overlay)?;
             visuals.healthbar_esp.render(&player, &render_ctx, &mut self.overlay)?;
         }
@@ -112,6 +118,7 @@ impl FeatureManager {
 
         // Check if any features are enabled before doing transforms
         if !visuals.box_esp.is_enabled()
+            && !visuals.head_esp.is_enabled()
             && !visuals.name_esp.is_enabled()
             && !visuals.healthbar_esp.is_enabled()
             && !misc.fps.is_enabled()

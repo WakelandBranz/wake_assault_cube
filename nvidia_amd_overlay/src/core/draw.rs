@@ -20,13 +20,13 @@ impl Overlay {
     pub fn draw_text(
         &mut self,
         (x, y): (f32, f32),
-        text: String,
+        text: &str,
         color: (u8, u8, u8, u8)
     ) -> Result <(), OverlayError> {
         self.update_solid_color_brush(color)?;
 
         // Get/update text layout from cache
-        let text_layout = self.update_text_layout(text.as_str())?;
+        let text_layout = self.update_text_layout(text)?;
 
         // Get reference to the updated/cached brush
         let brush = self.solid_color_brush.as_ref()
@@ -48,14 +48,14 @@ impl Overlay {
     pub fn draw_outlined_text(
         &mut self,
         (x, y): (f32, f32),
-        text: String,
+        text: &str,
         color: (u8, u8, u8, u8)
     ) -> Result<(), OverlayError> {
         // Outline
-        self.draw_text((x - 1.0, y), text.clone(), (0, 0, 0, 255))?;
-        self.draw_text((x + 1.0, y), text.clone(), (0, 0, 0, 255))?;
-        self.draw_text((x, y - 1.0), text.clone(), (0, 0, 0, 255))?;
-        self.draw_text((x, y + 1.0), text.clone(), (0, 0, 0, 255))?;
+        self.draw_text((x - 1.0, y), text, (0, 0, 0, 255))?;
+        self.draw_text((x + 1.0, y), text, (0, 0, 0, 255))?;
+        self.draw_text((x, y - 1.0), text, (0, 0, 0, 255))?;
+        self.draw_text((x, y + 1.0), text, (0, 0, 0, 255))?;
         // Main text
         self.draw_text((x, y), text, color)?;
 

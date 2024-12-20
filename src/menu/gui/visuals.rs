@@ -5,6 +5,7 @@ use std::sync::{Arc, RwLock};
 use eframe::egui;
 use serde::{Deserialize, Serialize};
 use crate::cheat::features::Feature;
+use crate::cheat::features::visuals::Position;
 use crate::config::Config;
 
 
@@ -37,11 +38,66 @@ impl TabVisuals {
                             ui.color_edit_button_rgba_unmultiplied(&mut box_esp.color);
                         });
 
+                        ui.horizontal(|ui| {
+                            ui.label("Outline Color:");
+                            ui.color_edit_button_rgba_unmultiplied(&mut box_esp.outline_color);
+                        });
+
                         ui.add(egui::Slider::new(&mut box_esp.thickness, 1.0..=5.0)
                             .text("Thickness"));
 
-                        ui.add(egui::Slider::new(&mut box_esp.width_scale, 0.0..=5.0)
-                            .text("Width Scale"));
+                        ui.checkbox(&mut box_esp.is_filled, "Filled").clicked();
+
+                        if box_esp.is_filled {
+                            ui.horizontal(|ui| {
+                                ui.label("Fill color 1:");
+                                ui.color_edit_button_rgba_unmultiplied(&mut box_esp.fill_color1);
+                            });
+                            ui.horizontal(|ui| {
+                                ui.label("Fill color 2:");
+                                ui.color_edit_button_rgba_unmultiplied(&mut box_esp.fill_color2);
+                            });
+                            ui.checkbox(&mut box_esp.is_vertical, "Vertical Fill").clicked();
+                        }
+                    });
+            }
+        }
+
+        // Head ESP
+        {
+            let head_esp = &mut visuals.head_esp;
+            ui.checkbox(&mut head_esp.enabled, "Head ESP").clicked();
+
+            if head_esp.is_enabled() {
+                egui::CollapsingHeader::new("Head ESP Settings")
+                    .open(Some(head_esp.enabled))
+                    .show(ui, |ui| {
+                        ui.horizontal(|ui| {
+                            ui.label("Color:");
+                            ui.color_edit_button_rgba_unmultiplied(&mut head_esp.color);
+                        });
+
+                        ui.horizontal(|ui| {
+                            ui.label("Outline color:");
+                            ui.color_edit_button_rgba_unmultiplied(&mut head_esp.outline_color);
+                        });
+
+                        ui.add(egui::Slider::new(&mut head_esp.thickness, 1.0..=5.0)
+                            .text("Thickness"));
+
+                        ui.checkbox(&mut head_esp.is_filled, "Filled").clicked();
+
+                        if head_esp.is_filled {
+                            ui.horizontal(|ui| {
+                                ui.label("Fill color 1:");
+                                ui.color_edit_button_rgba_unmultiplied(&mut head_esp.fill_color1);
+                            });
+                            ui.horizontal(|ui| {
+                                ui.label("Fill color 2:");
+                                ui.color_edit_button_rgba_unmultiplied(&mut head_esp.fill_color2);
+                            });
+                            ui.checkbox(&mut head_esp.is_radial, "Radial").clicked();
+                        }
                     });
             }
         }
@@ -60,9 +116,16 @@ impl TabVisuals {
                             ui.color_edit_button_rgba_unmultiplied(&mut name_esp.color);
                         });
 
-                        ui.add(egui::Slider::new(&mut name_esp.y_offset, -50.0..=50.0)
-                            .text("Y Offset")
-                            .suffix("px"));
+                        egui::ComboBox::from_label("Text Position")
+                            .selected_text(match name_esp.position {
+                                Position::Top => "Top",
+                                Position::Bottom => "Bottom",
+                                _ => unreachable!()
+                            })
+                            .show_ui(ui, |ui| {
+                                ui.selectable_value(&mut name_esp.position, Position::Top, "Top");
+                                ui.selectable_value(&mut name_esp.position, Position::Bottom, "Bottom");
+                            });
                     });
             }
         }
@@ -76,15 +139,28 @@ impl TabVisuals {
                 egui::CollapsingHeader::new("Healthbar ESP Settings")
                     .open(Some(healthbar_esp.enabled))
                     .show(ui, |ui| {
-                        ui.add(egui::Slider::new(&mut healthbar_esp.thickness, 0.01..=1.0)
+                        ui.add(egui::Slider::new(&mut healthbar_esp.thickness, 0.01..=0.05)
                             .text("Thickness"));
 
-                        ui.add(egui::Slider::new(&mut healthbar_esp.width_scale, 0.01..=1.0)
-                            .text("Width Scale"));
+                        egui::ComboBox::from_label("Healthbar Position")
+                            .selected_text(match healthbar_esp.position {
+                                Position::Top => "Top",
+                                Position::Bottom => "Bottom",
+                                Position::Left => "Left",
+                                Position::Right => "Right",
+                                _ => unreachable!()
+                            })
+                            .show_ui(ui, |ui| {
+                                ui.selectable_value(&mut healthbar_esp.position, Position::Top, "Top");
+                                ui.selectable_value(&mut healthbar_esp.position, Position::Bottom, "Bottom");
+                                ui.selectable_value(&mut healthbar_esp.position, Position::Left, "Left");
+                                ui.selectable_value(&mut healthbar_esp.position, Position::Right, "Right");
+                            });
 
-                        ui.add(egui::Slider::new(&mut healthbar_esp.x_offset, -200.0..=200.0)
-                            .text("X Offset")
-                            .suffix("px"));
+                        // Only show top_down checkbox for Left or Right positions
+                        if matches!(healthbar_esp.position, Position::Left | Position::Right) {
+                            ui.checkbox(&mut healthbar_esp.top_down, "Top Down").clicked();
+                        }
                     });
             }
         }
